@@ -79,7 +79,7 @@ Tài liệu gốc cho thiết kế và hiện thực bản tối thiểu.
 
 ## 10. Chuỗi in ra
 
-- O1. Board in thành 8 dòng, mỗi dòng 8 ký hiệu cách nhau một dấu cách. Ô sáng in `_`, ô tối in theo P2.
+- O1. Board in thành 8 dòng, mỗi dòng 8 ký hiệu cách nhau một dấu cách. Ô sáng in `-`, ô tối in theo P2.
 - O2. Dòng lượt: `Black's turn.` hoặc `Red's turn.`
 - O3. Lời nhắc, không xuống dòng: `Enter starting square: ` và `Enter landing square: `
 - O4. Nước đi sai: `Not a valid move! Try again.`
