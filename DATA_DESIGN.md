@@ -52,7 +52,6 @@ n = 17: r = 4, k = 0, r chẵn nên c = 2k+1 = 1, idx = (4+1)*10 + (1+1) = 52
 - D13. Mỗi biến trạng thái là một nhãn `.word` trong `.data`:
   - `turn`: phe đang đi, `'b'` hoặc `'r'`, khởi đầu `'b'`.
   - `cnt_b`, `cnt_r`: số quân còn lại của mỗi phe, khởi đầu 12.
-  - `chain`: idx của quân đang ăn chuỗi.
 - D14. Đổi lượt: turn = turn xor 0x10 (`'b'` = 0x62, `'r'` = 0x72).
 - D15. Ô thuộc phe p khi ký tự của ô bằng p (pawn) hoặc p - 32 (king). Phe đối phương là p xor 0x10.
 - D16. Phong cấp: trừ 32 vào ký tự của ô (chữ thường thành chữ hoa).
