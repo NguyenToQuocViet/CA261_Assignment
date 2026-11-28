@@ -5,7 +5,7 @@
 # print_board: 8x8 inner, space-separated
 print_board:
 	la $t0, board
-	addi $t0, $t0, 11       # idx 11 = (1, 1)
+	addi $t0, $t0, 11       # idx 11 = (1, 1), doi 11 o la vi border *
 	li $t1, 8               # row cnt
 
 pb_row:
@@ -28,7 +28,7 @@ pb_eol:
 	li $v0, 11
 	syscall
 	addi $t0, $t0, 2        # skip border
-	addi $t1, $t1, -1
+	addi $t1, $t1, -1	# xuong hang
 	bne $t1, $zero, pb_row
 	jr $ra
 
@@ -145,4 +145,86 @@ rp_dec:
 	lw $t3, 0($t2)
 	addi $t3, $t3, -1
 	sw $t3, 0($t2)
+	jr $ra
+
+# can_capture: $a0 s, $a1 d -> 1 if s+d enemy and s+2d empty
+can_capture:
+	addi $sp, $sp, -12
+	sw $ra, 8($sp)
+	sw $s0, 4($sp)
+	sw $s1, 0($sp)
+	move $s0, $a0
+	move $s1, $a1
+	la $t0, board
+	add $t0, $t0, $s0
+	add $t0, $t0, $s1
+	lb $a0, 0($t0)          # mid first: '*' stops before s+2d
+	lw $a1, turn
+	xori $a1, $a1, 0x10     # opponent
+	jal check_side
+	beq $v0, $zero, cc_end
+	la $t0, board
+	add $t0, $t0, $s0
+	sll $t1, $s1, 1
+	add $t0, $t0, $t1
+	lb $t1, 0($t0)          # landing
+	li $v0, 0
+	bne $t1, '0', cc_end
+	li $v0, 1
+
+cc_end:
+	lw $s1, 0($sp)
+	lw $s0, 4($sp)
+	lw $ra, 8($sp)
+	addi $sp, $sp, 12
+	jr $ra
+
+# ask_square: $a0 prompt -> idx
+ask_square:
+	addi $sp, $sp, -4
+	sw $ra, 0($sp)
+	li $v0, 4
+	syscall
+	li $v0, 5
+	syscall
+	move $a0, $v0
+	jal sq_to_idx
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4
+	jr $ra
+
+# do_step: $a0 s, $a1 t -> move, promote
+do_step:
+	addi $sp, $sp, -8
+	sw $ra, 4($sp)
+	sw $s0, 0($sp)
+	move $s0, $a1
+	jal move_piece
+	move $a0, $s0
+	jal try_promote
+	lw $s0, 0($sp)
+	lw $ra, 4($sp)
+	addi $sp, $sp, 8
+	jr $ra
+
+# do_capture: $a0 s, $a1 t -> remove mid, move, promote
+do_capture:
+	addi $sp, $sp, -12
+	sw $ra, 8($sp)
+	sw $s0, 4($sp)
+	sw $s1, 0($sp)
+	move $s0, $a0
+	move $s1, $a1
+	add $a0, $s0, $s1
+	sra $a0, $a0, 1         # mid = (s + t) / 2
+	jal remove_piece
+	move $a0, $s0
+	move $a1, $s1
+	jal move_piece
+	move $a0, $s1
+	jal try_promote
+	lw $s1, 0($sp)
+	lw $s0, 4($sp)
+	lw $ra, 8($sp)
+	addi $sp, $sp, 12
 	jr $ra
