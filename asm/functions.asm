@@ -94,3 +94,55 @@ cd_yes:
 
 cd_end:
 	jr $ra
+
+# move_piece: board[t] = board[s], board[s] = '0'
+move_piece:
+	la $t0, board
+	add $t1, $t0, $a0
+	add $t2, $t0, $a1
+	lb $t3, 0($t1)
+	sb $t3, 0($t2)
+	li $t3, '0'
+	sb $t3, 0($t1)
+	jr $ra
+
+# try_promote: b at row 1 / r at row 8 -> -32
+try_promote:
+	la $t0, board
+	add $t0, $t0, $a0
+	lb $t1, 0($t0)
+	li $t2, 10
+	div $a0, $t2
+	mflo $t2                # row = idx / 10
+	bne $t1, 'b', tp_red
+	bne $t2, 1, tp_end
+	j tp_up
+
+tp_red:
+	bne $t1, 'r', tp_end
+	bne $t2, 8, tp_end
+
+tp_up:
+	addi $t1, $t1, -32
+	sb $t1, 0($t0)
+
+tp_end:
+	jr $ra
+
+# remove_piece: board[idx] = '0', opponent cnt - 1
+remove_piece:
+	la $t0, board
+	add $t0, $t0, $a0
+	li $t1, '0'
+	sb $t1, 0($t0)
+	lw $t1, turn
+	xori $t1, $t1, 0x10     # opponent
+	la $t2, cnt_b
+	beq $t1, 'b', rp_dec
+	la $t2, cnt_r
+
+rp_dec:
+	lw $t3, 0($t2)
+	addi $t3, $t3, -1
+	sw $t3, 0($t2)
+	jr $ra
